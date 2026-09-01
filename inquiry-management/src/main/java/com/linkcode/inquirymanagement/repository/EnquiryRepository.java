@@ -57,4 +57,6 @@ public interface EnquiryRepository extends JpaRepository<Enquiry, Long> {
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     long countByJoiningDateGreaterThanEqualAndStatusNot(LocalDate joiningDate, EnquiryStatus status);
+
+    List<Enquiry> findByCreatedAtAfterAndStatusNot(LocalDateTime createdAt, EnquiryStatus status);
 }

@@ -56,15 +56,16 @@ export interface PagedResponse<T> {
 
 export type PageResponse<T> = PagedResponse<T>;
 
+export type NotificationType = "FOLLOW_UP" | "STATUS_CHANGED";
+
 export interface NotificationItem {
   id: string | number;
   enquiryId?: string | number;
   studentName: string;
   message: string;
-  type?: string;
+  type: NotificationType;
   isRead: boolean;
   createdAt: string;
-  courseInterested?: string;
 }
 
 export interface NotificationsResponse {

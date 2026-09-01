@@ -101,9 +101,11 @@ export function AdminTopbar({ onMenuClick }: { onMenuClick: () => void }) {
                             n.isRead ? "bg-slate-300" : "bg-blue-600 dot-pulse",
                           )} />
                           <div className="min-w-0 flex-1">
-                            <div className="text-[10px] font-bold uppercase tracking-wider text-rose-600">Follow up this lead</div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-rose-600">
+                              {n.type === "STATUS_CHANGED" ? "Status Changed" : "Follow Up"}
+                            </div>
                             <p className="mt-0.5 text-[13px] leading-snug text-slate-800">{n.message}</p>
-                            <p className="mt-1 text-[11.5px] text-slate-500">{n.courseInterested} · {formatRelative(n.createdAt)}</p>
+                            <p className="mt-1 text-[11.5px] text-slate-500">{formatRelative(n.createdAt)}</p>
                             {!n.isRead && (
                               <button onClick={() => markRead(n.id)} className="mt-1.5 text-[11.5px] font-semibold text-blue-600 hover:text-blue-700">Mark as read</button>
                             )}

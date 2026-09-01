@@ -40,12 +40,16 @@ export default function NotificationsPage() {
                   n.isRead ? "bg-slate-300" : "bg-blue-600 dot-pulse",
                 )} />
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-md bg-rose-50 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-700">Follow up this lead</span>
-                    <span className="text-[11.5px] text-slate-400">· {formatRelative(n.createdAt)}</span>
-                  </div>
-                  <p className="mt-1.5 text-[14px] font-semibold text-slate-900">{n.message}</p>
-                  <p className="mt-0.5 text-[12.5px] text-slate-500">{n.courseInterested}</p>
+                  {!n.isRead && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-md bg-rose-50 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-700">
+                        {n.type === "STATUS_CHANGED" ? "Status Changed" : "Follow Up"}
+                      </span>
+                      <span className="text-[11.5px] text-slate-400">· {formatRelative(n.createdAt)}</span>
+                    </div>
+                  )}
+                  <p className={cn("text-[14px] font-semibold", n.isRead ? "text-slate-600" : "text-slate-900 mt-1.5")}>{n.message}</p>
+                  {n.isRead && <p className="mt-0.5 text-[11.5px] text-slate-400">{formatRelative(n.createdAt)}</p>}
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   {n.enquiryId && (

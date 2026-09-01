@@ -38,19 +38,22 @@ export function NotificationProvider({ children, autoLoad = true }: { children: 
   }, [autoLoad, refresh]);
 
   const markRead = useCallback(async (id: string | number) => {
-    // Optimistic update
-    setNotifications(prev => prev.map(n => String(n.id) === String(id) ? { ...n, isRead: true } : n));
-    setUnreadCount(prev => {
-      const was = notifications.find(n => String(n.id) === String(id));
-      return was && !was.isRead ? Math.max(0, prev - 1) : prev;
-    });
-    try {
-      await notificationService.markRead(id);
-    } catch {
-      // Revert on failure
-      await refresh();
-    }
-  }, [notifications, refresh]);
+  try {
+    console.log("Marking notification as read:", id);
+
+    await notificationService.markAsRead(id);
+
+    console.log("Mark as read API successful:", id);
+
+    // Refresh only after successful backend update
+    await refresh();
+
+    console.log("Notifications refreshed");
+  } catch (error) {
+    console.error("Failed to mark notification as read:", error);
+    await refresh();
+  }
+}, [refresh]);
 
   const value = useMemo(() => ({
     unreadCount, notifications, loading, refresh, markRead, panelOpen, setPanelOpen,

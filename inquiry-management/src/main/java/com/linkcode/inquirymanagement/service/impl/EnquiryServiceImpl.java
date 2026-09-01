@@ -6,9 +6,12 @@ import com.linkcode.inquirymanagement.dto.response.CreateEnquiryResponse;
 import com.linkcode.inquirymanagement.dto.response.EnquiryListResponse;
 import com.linkcode.inquirymanagement.dto.response.PagedResponse;
 import com.linkcode.inquirymanagement.entity.Enquiry;
+import com.linkcode.inquirymanagement.entity.Notification;
 import com.linkcode.inquirymanagement.enums.EnquiryStatus;
+import com.linkcode.inquirymanagement.enums.NotificationType;
 import com.linkcode.inquirymanagement.exception.EnquiryNotFoundException;
 import com.linkcode.inquirymanagement.repository.EnquiryRepository;
+import com.linkcode.inquirymanagement.repository.NotificationRepository;
 import com.linkcode.inquirymanagement.service.EnquiryService;
 import com.linkcode.inquirymanagement.service.EmailService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +38,7 @@ import java.util.List;
 public class EnquiryServiceImpl implements EnquiryService {
 
     private final EnquiryRepository enquiryRepository;
+    private final NotificationRepository notificationRepository;
     private final EmailService emailService;
 
     @Override
@@ -139,6 +143,8 @@ public class EnquiryServiceImpl implements EnquiryService {
         Enquiry enquiry = enquiryRepository.findById(id)
                 .orElseThrow(() -> new EnquiryNotFoundException(id));
 
+        EnquiryStatus oldStatus = enquiry.getStatus();
+
         if (request.getStatus() != null) {
             enquiry.setStatus(request.getStatus());
         }
@@ -148,6 +154,23 @@ public class EnquiryServiceImpl implements EnquiryService {
         }
 
         Enquiry updatedEnquiry = enquiryRepository.save(enquiry);
+
+        if (request.getStatus() != null && oldStatus != request.getStatus()) {
+            EnquiryStatus newStatus = request.getStatus();
+            if (newStatus == EnquiryStatus.INTERESTED
+                    || newStatus == EnquiryStatus.HOT
+                    || newStatus == EnquiryStatus.COLD) {
+                Notification notification = Notification.builder()
+                        .enquiry(updatedEnquiry)
+                        .type(NotificationType.STATUS_CHANGED)
+                        .message(updatedEnquiry.getStudentName() + " is now " + newStatus.name())
+                        .isRead(false)
+                        .build();
+                notificationRepository.save(notification);
+                log.info("Created STATUS_CHANGED notification for enquiry ID: {} ({} -> {})",
+                        updatedEnquiry.getId(), oldStatus, newStatus);
+            }
+        }
 
         return EnquiryListResponse.builder()
                 .id(updatedEnquiry.getId())
