@@ -1,39 +1,58 @@
 services:
+
   mysql:
     image: mysql:8.0
     container_name: inquiry_name
     restart: unless-stopped
 
     environment:
-      MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: INQUIRY
-
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
 
     volumes:
       - mysql_data:/var/lib/mysql
 
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123" ]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-p${MYSQL_ROOT_PASSWORD}"
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
 
   backend:
-      build: .
-      container_name: inquiry_backend
-      restart: unless-stopped
+    build: .
+    container_name: inquiry_backend
+    restart: unless-stopped
 
-      ports:
-        - "8080:8080"
+    ports:
+      - "8080:8080"
 
-      environment:
-        SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/INQUIRY?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-        SPRING_DATASOURCE_USERNAME: root
-        SPRING_DATASOURCE_PASSWORD: root123
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
 
-      depends_on:
-        mysql:
-          condition: service_healthy
+      APP_JWT_SECRET: ${APP_JWT_SECRET}
+      APP_JWT_EXPIRATION: ${APP_JWT_EXPIRATION}
+
+      APP_ADMIN_USERNAME: ${APP_ADMIN_USERNAME}
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
+      APP_ADMIN_EMAIL: ${APP_ADMIN_EMAIL}
+
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+
+    depends_on:
+      mysql:
+        condition: service_healthy
 
 
 volumes:
