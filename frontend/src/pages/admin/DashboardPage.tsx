@@ -16,6 +16,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+
+  // testing the ci/cd from frontend 
   async function load() {
     setLoading(true);
     setError(false);
