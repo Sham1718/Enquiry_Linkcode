@@ -2,10 +2,16 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { notificationService } from "../services/notification.service";
 import type { NotificationItem } from "../types";
 
+const PAGE_SIZE = 10;
+
 interface NotificationContextValue {
   unreadCount: number;
   notifications: NotificationItem[];
   loading: boolean;
+  page: number;
+  totalPages: number;
+  totalElements: number;
+  setPage: (page: number) => void;
   refresh: () => Promise<void>;
   markRead: (id: string | number) => Promise<void>;
   panelOpen: boolean;
@@ -19,19 +25,24 @@ export function NotificationProvider({ children, autoLoad = true }: { children: 
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await notificationService.list();
+      const res = await notificationService.list({ page, size: PAGE_SIZE });
       setNotifications(res.notifications);
       setUnreadCount(res.unreadCount);
+      setTotalPages(res.totalPages);
+      setTotalElements(res.totalElements);
     } catch {
       // silent — UI surfaces fallback state
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     if (autoLoad) refresh();
@@ -56,8 +67,9 @@ export function NotificationProvider({ children, autoLoad = true }: { children: 
 }, [refresh]);
 
   const value = useMemo(() => ({
-    unreadCount, notifications, loading, refresh, markRead, panelOpen, setPanelOpen,
-  }), [unreadCount, notifications, loading, refresh, markRead, panelOpen]);
+    unreadCount, notifications, loading, page, totalPages, totalElements, setPage,
+    refresh, markRead, panelOpen, setPanelOpen,
+  }), [unreadCount, notifications, loading, page, totalPages, totalElements, refresh, markRead, panelOpen]);
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 }

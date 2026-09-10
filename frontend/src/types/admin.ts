@@ -71,6 +71,12 @@ export interface NotificationItem {
 export interface NotificationsResponse {
   unreadCount: number;
   notifications: NotificationItem[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first?: boolean;
+  last?: boolean;
 }
 
 export interface DashboardData {

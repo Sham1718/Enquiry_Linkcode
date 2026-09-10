@@ -1,12 +1,11 @@
 package com.linkcode.inquirymanagement.service;
 
 import com.linkcode.inquirymanagement.dto.response.NotificationResponse;
-
-import java.util.List;
+import com.linkcode.inquirymanagement.dto.response.PagedResponse;
 
 public interface NotificationService {
 
-    List<NotificationResponse> getAllNotifications();
+    PagedResponse<NotificationResponse> getAllNotifications(int page, int size);
 
     long getUnreadNotificationCount();
 

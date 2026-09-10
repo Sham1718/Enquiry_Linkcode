@@ -1,11 +1,16 @@
 package com.linkcode.inquirymanagement.service.impl;
 
 import com.linkcode.inquirymanagement.dto.response.NotificationResponse;
+import com.linkcode.inquirymanagement.dto.response.PagedResponse;
 import com.linkcode.inquirymanagement.entity.Notification;
 import com.linkcode.inquirymanagement.exception.NotificationNotFoundException;
 import com.linkcode.inquirymanagement.repository.NotificationRepository;
 import com.linkcode.inquirymanagement.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +22,26 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
 
     @Override
-    public List<NotificationResponse> getAllNotifications() {
-        return notificationRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
+    public PagedResponse<NotificationResponse> getAllNotifications(int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<Notification> notificationPage = notificationRepository.findAll(pageable);
+
+        List<NotificationResponse> content = notificationPage.getContent().stream()
                 .map(this::mapToResponse)
                 .toList();
+
+        PagedResponse<NotificationResponse> pagedResponse = new PagedResponse<>();
+        pagedResponse.setContent(content);
+        pagedResponse.setPage(notificationPage.getNumber());
+        pagedResponse.setSize(notificationPage.getSize());
+        pagedResponse.setTotalElements(notificationPage.getTotalElements());
+        pagedResponse.setTotalPages(notificationPage.getTotalPages());
+        pagedResponse.setFirst(notificationPage.isFirst());
+        pagedResponse.setLast(notificationPage.isLast());
+
+        return pagedResponse;
     }
 
     @Override

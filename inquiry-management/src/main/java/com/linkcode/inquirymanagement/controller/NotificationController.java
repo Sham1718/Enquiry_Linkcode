@@ -2,14 +2,15 @@ package com.linkcode.inquirymanagement.controller;
 
 import com.linkcode.inquirymanagement.dto.response.ApiResponse;
 import com.linkcode.inquirymanagement.dto.response.NotificationResponse;
+import com.linkcode.inquirymanagement.dto.response.PagedResponse;
 import com.linkcode.inquirymanagement.service.NotificationService;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/notifications")
@@ -20,11 +21,15 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<NotificationResponse>>> getAllNotifications() {
+    public ResponseEntity<ApiResponse<PagedResponse<NotificationResponse>>> getAllNotifications(
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size
+    ) {
 
-        List<NotificationResponse> responseData = notificationService.getAllNotifications();
+        PagedResponse<NotificationResponse> responseData =
+                notificationService.getAllNotifications(page, size);
 
-        ApiResponse<List<NotificationResponse>> response = ApiResponse.success(
+        ApiResponse<PagedResponse<NotificationResponse>> response = ApiResponse.success(
                 "Notifications retrieved successfully.",
                 responseData
         );

@@ -1,4 +1,4 @@
-import type { DashboardData, Enquiry, NotificationItem, NotificationsResponse, PagedResponse } from "../../types";
+import type { DashboardData, Enquiry, NotificationItem, PagedResponse } from "../../types";
 
 const COURSES = [
   "Java Full Stack Development",
@@ -117,8 +117,8 @@ export function buildMockEnquiriesPage(params: {
   };
 }
 
-export function buildMockNotifications(): NotificationsResponse {
-  const items: NotificationItem[] = [
+export function buildMockNotifications(): NotificationItem[] {
+  const all: NotificationItem[] = [
     {
       id: 1,
       enquiryId: MOCK_ENQUIRIES[0].id,
@@ -165,5 +165,41 @@ export function buildMockNotifications(): NotificationsResponse {
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 36).toISOString(),
     },
   ];
-  return { unreadCount: items.filter(i => !i.isRead).length, notifications: items };
+
+  // Older notifications so pagination has multiple pages to show
+  for (let i = 0; i < 14; i++) {
+    const e = MOCK_ENQUIRIES[(i + 5) % MOCK_ENQUIRIES.length];
+    all.push({
+      id: 6 + i,
+      enquiryId: e.id,
+      studentName: e.studentName,
+      message: `Follow up for ${e.studentName}.`,
+      isRead: true,
+      type: i % 3 === 0 ? "STATUS_CHANGED" : "FOLLOW_UP",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * (i + 3)).toISOString(),
+    });
+  }
+
+  return all;
+}
+
+export function buildMockNotificationsPage(
+  all: NotificationItem[],
+  params: { page?: number; size?: number } = {}
+): PagedResponse<NotificationItem> {
+  const page = Math.max(0, params.page ?? 0);
+  const size = params.size ?? 10;
+  const totalElements = all.length;
+  const totalPages = Math.max(1, Math.ceil(totalElements / size));
+  const content = all.slice(page * size, (page + 1) * size);
+
+  return {
+    content,
+    page,
+    size,
+    totalElements,
+    totalPages,
+    first: page === 0,
+    last: page >= totalPages - 1,
+  };
 }

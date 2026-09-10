@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from "axios";
 import type { ApiResponse } from "../types";
-import { MOCK_ENQUIRIES, buildMockDashboard, buildMockEnquiriesPage, buildMockNotifications } from "../data/mock";
+import { MOCK_ENQUIRIES, buildMockDashboard, buildMockEnquiriesPage, buildMockNotifications, buildMockNotificationsPage } from "../data/mock";
 
 export const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || "http://localhost:8080";
 export const USE_MOCK_API = String((import.meta as any).env?.VITE_USE_MOCK_API ?? "false").toLowerCase() === "true";
@@ -153,7 +153,7 @@ function fail(message: string, status: number) {
 
 const mockStore = {
   enquiries: [...MOCK_ENQUIRIES],
-  notifications: buildMockNotifications().notifications,
+  notifications: buildMockNotifications(),
 };
 
 export const mockHandlers = {
@@ -227,9 +227,9 @@ export const mockHandlers = {
     return ok(buildMockDashboard());
   },
 
-  async getNotifications() {
+  async getNotifications(params: { page?: number; size?: number } = {}) {
     await delay(300);
-    return ok(mockStore.notifications);
+    return ok(buildMockNotificationsPage(mockStore.notifications, params));
   },
 
   async getUnreadNotificationCount() {

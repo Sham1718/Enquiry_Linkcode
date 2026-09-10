@@ -2,11 +2,14 @@ import { Link } from "react-router-dom";
 import { useNotifications } from "../../context/NotificationContext";
 import { EmptyState, Skeleton } from "../../components/admin/common/EmptyState";
 import { Button } from "../../components/admin/common/Button";
+import { Pagination } from "../../components/admin/Pagination";
 import { formatRelative } from "../../utils/cn";
 import { cn } from "../../utils/cn";
 
+const PAGE_SIZE = 10;
+
 export default function NotificationsPage() {
-  const { notifications, loading, markRead, unreadCount, refresh } = useNotifications();
+  const { notifications, loading, markRead, unreadCount, refresh, page, totalPages, totalElements, setPage } = useNotifications();
 
   return (
     <div className="space-y-5 anim-fade-up">
@@ -65,6 +68,16 @@ export default function NotificationsPage() {
             </li>
           ))}
         </ul>
+      )}
+
+      {!loading && notifications.length > 0 && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPage={setPage}
+          totalElements={totalElements}
+          size={PAGE_SIZE}
+        />
       )}
     </div>
   );
