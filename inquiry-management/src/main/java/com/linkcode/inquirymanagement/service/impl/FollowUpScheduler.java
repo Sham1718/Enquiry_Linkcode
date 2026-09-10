@@ -80,12 +80,26 @@ public class FollowUpScheduler {
     // 9:00 AM daily cron — joining-date & null-joining-date
     // ────────────────────────────────────────────────
 
-    @Scheduled(cron = "0 * * * * *", zone = "Asia/Kolkata")
+    // FIX: was "0 * * * * *" (fires every minute, every hour, every day).
+    // Correct 6-field Spring cron (second minute hour day month weekday) for
+    // "once daily at 9:00 AM IST" is "0 0 9 * * *".
+    @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Kolkata")
     public void createDailyFollowUpNotifications() {
         try {
             LocalDate today = LocalDate.now(ZONE);
-            LocalDateTime dayStart = today.atStartOfDay(ZONE).toLocalDateTime();
-            LocalDateTime dayEnd = today.atTime(LocalTime.MAX);
+
+            // FIX: build the IST calendar-day boundaries as zoned instants, then
+            // convert to UTC before comparing against createdAt. createdAt is
+            // persisted using UTC (see checkNewEnquiries above), so comparing
+            // it against naive IST wall-clock numbers let notifications created
+            // roughly between 00:00–05:30 IST fall outside [dayStart, dayEnd],
+            // which made the "already exists" check miss them and recreate a
+            // duplicate on every run.
+            ZonedDateTime startOfDayIst = today.atStartOfDay(ZONE);
+            ZonedDateTime endOfDayIst = today.plusDays(1).atStartOfDay(ZONE).minusNanos(1);
+
+            LocalDateTime dayStart = startOfDayIst.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+            LocalDateTime dayEnd = endOfDayIst.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
 
             log.info("Running daily follow-up notification check for date: {}", today);
 
