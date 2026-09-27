@@ -82,7 +82,7 @@ const Hero = () => {
         <div id="enquiry" className="scroll-mt-28">
           <form
             onSubmit={handleSubmit}
-            className="w-full rounded-2xl border border-white/10 bg-white/4 p-6 backdrop-blur-sm sm:p-8"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8"
           >
             <h2 className="text-2xl font-semibold">Talk to an advisor</h2>
             <p className="mt-2 text-sm text-gray-400">
