@@ -1,5 +1,9 @@
 # React + Vite
 
+## Backend connection
+
+During local development, Vite proxies `/api` requests to the Spring Boot backend at `http://localhost:8080`. Start the backend first, then run `npm run dev` from this folder. For a separately hosted frontend, set `VITE_API_BASE_URL` to the backend origin before building the client.
+
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
 Currently, two official plugins are available:

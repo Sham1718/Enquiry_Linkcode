@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths:
-      - "frontend/**"
+      - "client/**"
       - ".github/workflows/frontend_ci.yml"
 
   pull_request:
     branches:
       - main
     paths:
-      - "frontend/**"
+      - "client/**"
       - ".github/workflows/frontend_ci.yml"
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: frontend
+        working-directory: client
 
     steps:
       - name: Checkout code
@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: client/package-lock.json
 
       - name: Install dependencies
         run: npm ci

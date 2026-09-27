@@ -1,4 +1,41 @@
+import { useState } from "react";
+import { submitEnquiry } from "../../services/enquiryService";
+
 const Hero = () => {
+  const [submitting, setSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setFeedback({ type: "", message: "" });
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      await submitEnquiry({
+        studentName: formData.get("studentName"),
+        email: formData.get("email"),
+        phone: formData.get("phone"),
+        courseInterested: formData.get("courseInterested"),
+        reference: formData.get("reference"),
+      });
+      form.reset();
+      setFeedback({
+        type: "success",
+        message: "Thanks! Your enquiry was received. We will contact you soon.",
+      });
+    } catch (error) {
+      setFeedback({
+        type: "error",
+        message: error.message || "Unable to submit your enquiry. Please try again.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <section
       id="home"
@@ -42,21 +79,94 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Right Side */}
-        <div className="flex justify-center">
-          <div className="relative flex h-80 w-full max-w-md items-center justify-center rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm">
+        <div id="enquiry" className="scroll-mt-28">
+          <form
+            onSubmit={handleSubmit}
+            className="w-full rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8"
+          >
+            <h2 className="text-2xl font-semibold">Talk to an advisor</h2>
+            <p className="mt-2 text-sm text-gray-400">
+              Share your details and we will help you find the right course.
+            </p>
 
-            <div className="text-center">
-              <div className="text-6xl font-bold text-blue-500">
-                10K+
-              </div>
-
-              <p className="mt-2 text-gray-400">
-                Students Trained
-              </p>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <label className="grid gap-2 text-sm text-gray-300">
+                Full name
+                <input
+                  name="studentName"
+                  autoComplete="name"
+                  required
+                  minLength={2}
+                  maxLength={100}
+                  placeholder="Your name"
+                  className="min-w-0 rounded-md border border-white/15 bg-black/40 px-3 py-2.5 text-white outline-none transition focus:border-blue-500"
+                />
+              </label>
+              <label className="grid gap-2 text-sm text-gray-300">
+                Phone number
+                <input
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  required
+                  inputMode="numeric"
+                  pattern="[6-9][0-9]{9}"
+                  title="Enter a valid 10-digit Indian mobile number"
+                  placeholder="10-digit mobile number"
+                  className="min-w-0 rounded-md border border-white/15 bg-black/40 px-3 py-2.5 text-white outline-none transition focus:border-blue-500"
+                />
+              </label>
+              <label className="grid gap-2 text-sm text-gray-300 sm:col-span-2">
+                Email address
+                <input
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  maxLength={150}
+                  placeholder="you@example.com"
+                  className="min-w-0 rounded-md border border-white/15 bg-black/40 px-3 py-2.5 text-white outline-none transition focus:border-blue-500"
+                />
+              </label>
+              <label className="grid gap-2 text-sm text-gray-300 sm:col-span-2">
+                Course of interest
+                <input
+                  name="courseInterested"
+                  required
+                  maxLength={150}
+                  placeholder="e.g. Full Stack Development"
+                  className="min-w-0 rounded-md border border-white/15 bg-black/40 px-3 py-2.5 text-white outline-none transition focus:border-blue-500"
+                />
+              </label>
+              <label className="grid gap-2 text-sm text-gray-300 sm:col-span-2">
+                How did you hear about us? <span className="text-gray-500">(optional)</span>
+                <input
+                  name="reference"
+                  maxLength={150}
+                  placeholder="Friend, social media, or other"
+                  className="min-w-0 rounded-md border border-white/15 bg-black/40 px-3 py-2.5 text-white outline-none transition focus:border-blue-500"
+                />
+              </label>
             </div>
 
-          </div>
+            {feedback.message && (
+              <p
+                role="status"
+                aria-live="polite"
+                className={`mt-4 text-sm ${feedback.type === "success" ? "text-emerald-400" : "text-red-400"}`}
+              >
+                {feedback.message}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-6 w-full rounded-md bg-blue-600 px-5 py-3 font-semibold transition hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60"
+            >
+              {submitting ? "Sending..." : "Send enquiry"}
+            </button>
+          </form>
         </div>
 
       </div>
