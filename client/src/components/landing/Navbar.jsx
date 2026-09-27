@@ -47,9 +47,9 @@ const Navbar = () => {
         </div>
 
         {/* CTA Button */}
-        <button className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold transition hover:bg-blue-700">
+        <a href="#enquiry" className="rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold transition hover:bg-blue-700">
           Enroll Now
-        </button>
+        </a>
 
       </div>
     </nav>
