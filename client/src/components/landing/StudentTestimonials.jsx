@@ -52,7 +52,7 @@ const StudentTestimonials = () => {
               <iframe
                 src={testimonial.videoUrl}
                 title={testimonial.name}
-                className="h-[520px] w-full"
+                className="h-130 w-full"
                 frameBorder="0"
                 scrolling="no"
                 allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
