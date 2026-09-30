@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { submitEnquiry } from "../services/enquiryService";
-import CourseSelector from '../components/common/courseSelector.jsx';
-import ReferenceSelector from '../components/common/referenceSelector.jsx';
-import UserTypeSelector from '../components/common/UserTypeSelector.jsx';
+import { submitEnquiry } from "../../services/enquiryService";
+import CourseSelector from '../common/courseSelector.jsx';
+import ReferenceSelector from '../common/referenceSelector.jsx';
+import UserTypeSelector from '../common/UserTypeSelector.jsx';
 
 const courses = [
   "Java Full Stack Development",
